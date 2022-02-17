@@ -21,6 +21,7 @@ public:
     vec3 pixelBi(float x, float y) const;
     vec3 pixelUV(float x, float y) const;
     int width() const;
+    int height() const;
 };
 
 #endif

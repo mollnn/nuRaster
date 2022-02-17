@@ -75,3 +75,8 @@ int Texture::width() const
 {
     return width_;
 }
+
+int Texture::height() const
+{
+    return height_;
+}
