@@ -8,9 +8,9 @@
 #include "shaderlambert.h"
 #include "shaderblinnphong.h"
 #include "matblinnphong.h"
-#include <QMatrix4x4>
+#include "mat4.h"
 
-void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangles, QImage &img, const vec3& light_pos, const vec3& light_int, int img_width, int img_height)
+void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangles, QImage &img, const vec3 &light_pos, const vec3 &light_int, int img_width, int img_height)
 {
     img = QImage(QSize(img_width, img_height), QImage::Format_RGB888);
     img.fill(Qt::black);
@@ -26,13 +26,20 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
 
     Pipeline pipeline;
 
-    // TODO: Calculate your own MVP matrix
-    QMatrix4x4 mvp;
-    mvp.perspective(camera.fov_h * std::max(1.0f, camera.aspect), 1, 1, 10000);
-    vec3 look_at_center = camera.pos + camera.gaze * 100.0f;
-    mvp.lookAt({camera.pos[0], camera.pos[1], camera.pos[2]},
-               {look_at_center[0], look_at_center[1], look_at_center[2]},
-               {camera.up[0], camera.up[1], camera.up[2]});
+    float clip_near = -1.0f;
+    float clip_far = -10000.0f;
+    float clip_up = -clip_near * tan(camera.fov_h * 3.14159 / 180 / 2);
+    float clip_right = clip_up * camera.aspect;
+
+    mat4 view_translate = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-camera.pos, 1}};
+    mat4 view_rotate = {{camera.gaze.cross(camera.up), 0}, {camera.up, 0}, {-camera.gaze, 0}, {0, 0, 0, 1}};
+    view_rotate = view_rotate.T();
+    mat4 ortho = {{1.0f / clip_right, 0.0f, 0.0f, 0.0f},
+                  {0.0f, 1.0f / clip_up, 0.0f, 0.0f},
+                  {0.0f, 0.0f, 2.0f / (clip_near - clip_far), 0.0f},
+                  {0.0f, 0.0f, (clip_near + clip_far) / (clip_far - clip_near), 1.0f}};
+    mat4 persp2ortho = {{clip_near, 0, 0, 0}, {0, clip_near, 0, 0}, {0, 0, clip_near + clip_far, 1}, {0, 0, -clip_near * clip_far, 0}};
+    mat4 mvp = ortho * persp2ortho * view_rotate * view_translate;
 
     int width = color_buffer.width();
     int height = color_buffer.height();
@@ -71,11 +78,8 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
         const MatBlinnPhong *material = dynamic_cast<const MatBlinnPhong *>(material_list[material_id]);
 
         ShaderBlinnPhong shader;
-        shader.uniforms.mvp = {
-            {mvp(0, 0), mvp(1, 0), mvp(2, 0), mvp(3, 0)},
-            {mvp(0, 1), mvp(1, 1), mvp(2, 1), mvp(3, 1)},
-            {mvp(0, 2), mvp(1, 2), mvp(2, 2), mvp(3, 2)},
-            {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
+
+        shader.uniforms.mvp = mvp;
 
         if (material != nullptr)
         {

@@ -93,7 +93,6 @@ void Pipeline::drawcall(const std::vector<float> &vbo, const Shader &shader, Tex
                     }
                     vec4 color = shader.fragmentShader(ws_pos, varying);
                     float z = ws_pos[2];
-
                     // Depth test
                     if (z < z_buffer.pixel(x, y)[0])
                     {

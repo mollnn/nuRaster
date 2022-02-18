@@ -50,7 +50,7 @@ private:
     QLabel label_yaw_, label_pitch_, label_roll_;
     QLabel label_fov_h_, label_aspect_, label_img_w_, label_img_h_, label_preview_level_;
     QLabel label_scene_;
-    float light_pos_x_=500.0f, light_pos_y_=500.0f, light_pos_z_=500.0f, light_int_x_=100000.0f, light_int_y_=100000.0f, light_int_z_=100000.0f;
+    float light_pos_x_=500.0f, light_pos_y_=500.0f, light_pos_z_=500.0f, light_int_x_=1000000.0f, light_int_y_=1000000.0f, light_int_z_=1000000.0f;
     int img_width_ = 256, img_height_ = 256, preview_level_ = 8;
     QTime last_review_render_time_;
     QTextEdit text_edit_scene_;

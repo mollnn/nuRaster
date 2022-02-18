@@ -53,7 +53,7 @@ void GlWidget::paintGL()
 {
     vao_.bind();
     QMatrix4x4 mvp;
-    mvp.perspective(camera_->fov_h * std::max(1.0f, camera_->aspect), 1, 1, 10000);
+    mvp.perspective(atan(tan(camera_->fov_h * 3.14159 / 180 / 2) * std::max(1.0f, camera_->aspect)) * 180 / 3.14159 * 2, 1, 1, 10000);
     vec3 look_at_center = camera_->pos + camera_->gaze * 100.0f;
     mvp.lookAt({camera_->pos[0], camera_->pos[1], camera_->pos[2]},
                {look_at_center[0], look_at_center[1], look_at_center[2]},
