@@ -6,13 +6,15 @@ std::tuple<vec4, ShaderLambertPayloadV> ShaderLambert::_vertexShader(const Shade
     vec4 pos = uniforms.mvp * vec4(attributes.pos, 1.0f);
     varying.normal = (uniforms.mvp * vec4(attributes.normal, 0.0f)).xyz();
     varying.world_space_pos = attributes.pos;
+    varying.texcoord = attributes.texcoord;
     return {pos, varying};
 }
 
 vec4 ShaderLambert::_fragmentShader(const vec4 &pos, const ShaderLambertPayloadV &varying) const
 {
     vec3 light_fragpos = uniforms.light_pos - varying.world_space_pos;
-    return vec4(uniforms.kd * uniforms.light_intensity * std::max(0.0f, light_fragpos.normalized().dot(varying.normal.normalized())) / light_fragpos.norm2() / 3.14159f, 1.0f);
+    vec3 kd = uniforms.use_tex_kd ? uniforms.tex_kd->pixelUV(varying.texcoord[0], varying.texcoord[1]) : uniforms.kd;
+    return vec4(kd * uniforms.light_intensity * std::max(0.0f, light_fragpos.normalized().dot(varying.normal.normalized())) / light_fragpos.norm2() / 3.14159f, 1.0f);
 }
 
 std::tuple<vec4, std::vector<float>> ShaderLambert::vertexShader(const std::vector<float> &attributes_raw) const

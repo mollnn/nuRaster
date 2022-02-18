@@ -78,7 +78,9 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
             {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
 
         shader.uniforms.kd = material->Kd_;
-        std::cout << shader.uniforms.kd << std::endl;
+        shader.uniforms.use_tex_kd = material->usetex_Kd_;
+        shader.uniforms.tex_kd = &material->map_Kd_;
+        
         shader.uniforms.light_pos = vec3(200.0f, 500.0f, -300.0f);
         shader.uniforms.light_intensity = 1000000.0f;
 

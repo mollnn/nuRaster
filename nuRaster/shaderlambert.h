@@ -5,6 +5,7 @@
 #include "vec4.h"
 #include "mat4.h"
 #include "shader.h"
+#include "texture.h"
 
 struct ShaderLambertPayloadA
 {
@@ -17,12 +18,15 @@ struct ShaderLambertPayloadV
 {
     vec3 world_space_pos;
     vec3 normal;
+    vec3 texcoord;
 };
 
 struct ShaderLambertUniforms
 {
     mat4 mvp;
     vec3 kd;
+    bool use_tex_kd;
+    const Texture* tex_kd;
     vec3 light_pos;
     vec3 light_intensity;
 };
