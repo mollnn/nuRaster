@@ -68,8 +68,6 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
     for (int material_id = 0; material_id < material_count; material_id++)
     {
         const MatBlinnPhong *material = dynamic_cast<const MatBlinnPhong *>(material_list[material_id]);
-        if (material == nullptr)
-            continue;
 
         ShaderBlinnPhong shader;
         shader.uniforms.mvp = {
@@ -78,18 +76,33 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
             {mvp(0, 2), mvp(1, 2), mvp(2, 2), mvp(3, 2)},
             {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
 
-        shader.uniforms.ka = material->Ka_;
-        shader.uniforms.use_tex_ka = material->usetex_Ka_;
-        shader.uniforms.tex_ka = &material->map_Ka_;
+        if (material != nullptr)
+        {
+            shader.uniforms.ka = material->Ka_;
+            shader.uniforms.use_tex_ka = material->usetex_Ka_;
+            shader.uniforms.tex_ka = &material->map_Ka_;
 
-        shader.uniforms.kd = material->Kd_;
-        shader.uniforms.use_tex_kd = material->usetex_Kd_;
-        shader.uniforms.tex_kd = &material->map_Kd_;
+            shader.uniforms.kd = material->Kd_;
+            shader.uniforms.use_tex_kd = material->usetex_Kd_;
+            shader.uniforms.tex_kd = &material->map_Kd_;
 
-        shader.uniforms.ks = material->Ks_;
-        shader.uniforms.ns = material->Ns_;
-        shader.uniforms.use_tex_ks = material->usetex_Ks_;
-        shader.uniforms.tex_ks = &material->map_Ks_;
+            shader.uniforms.ks = material->Ks_;
+            shader.uniforms.ns = material->Ns_;
+            shader.uniforms.use_tex_ks = material->usetex_Ks_;
+            shader.uniforms.tex_ks = &material->map_Ks_;
+        }
+        else
+        {
+            shader.uniforms.ka = 0.0f;
+            shader.uniforms.use_tex_ka = false;
+
+            shader.uniforms.kd = 0.7f;
+            shader.uniforms.use_tex_kd = false;
+            
+            shader.uniforms.ks = 0.0f;
+            shader.uniforms.ns = 1.0f;
+            shader.uniforms.use_tex_ks = false;
+        }
 
         shader.uniforms.light_pos = vec3(300.0f, 1200.0f, -500.0f);
         shader.uniforms.light_intensity = 1000000.0f;
