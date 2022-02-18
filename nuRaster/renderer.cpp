@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "shader.h"
 #include "shadernormal.h"
+#include "shaderlambert.h"
 #include <QMatrix4x4>
 
 void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangles, QImage &img, int SPP, int img_width, int img_height)
@@ -30,12 +31,16 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
                {look_at_center[0], look_at_center[1], look_at_center[2]},
                {camera.up[0], camera.up[1], camera.up[2]});
 
-    ShaderNormal shader;
+    ShaderLambert shader;
     shader.uniforms.mvp = {
         {mvp(0, 0), mvp(1, 0), mvp(2, 0), mvp(3, 0)},
         {mvp(0, 1), mvp(1, 1), mvp(2, 1), mvp(3, 1)},
         {mvp(0, 2), mvp(1, 2), mvp(2, 2), mvp(3, 2)},
         {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
+
+    shader.uniforms.kd = 0.7;
+    shader.uniforms.light_pos = vec3(200.0f, 500.0f, -300.0f);
+    shader.uniforms.light_intensity = 1000000.0f;
 
     std::vector<float> vbo;
     for (const auto &triangle : triangles)
@@ -56,7 +61,8 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
     {
         for (int j = 0; j < img_width; j++)
         {
-            vec3 c = color_buffer.pixel(j, i) * 255.0f;
+            vec3 c = max(0.0f, min(1.0f, color_buffer.pixel(j, i))) * 255.0f;
+
             img.setPixelColor(j, i, QColor(c[0], c[1], c[2]));
         }
     }

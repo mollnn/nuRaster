@@ -39,9 +39,9 @@ void Pipeline::drawcall(const std::vector<float> &vbo, const Shader &shader, Tex
         vec3 sp1((p1[0] / p1[3] * 0.5f + 0.5f) * width, (p1[1] / p1[3] * 0.5f + 0.5f) * height, 0.0f);
         vec3 sp2((p2[0] / p2[3] * 0.5f + 0.5f) * width, (p2[1] / p2[3] * 0.5f + 0.5f) * height, 0.0f);
 
-        float inv_w0 = 1.0f / sp0[3];
-        float inv_w1 = 1.0f / sp1[3];
-        float inv_w2 = 1.0f / sp2[3];
+        float inv_w0 = 1.0f / p0[3];
+        float inv_w1 = 1.0f / p1[3];
+        float inv_w2 = 1.0f / p2[3];
 
         int y_min = height - 1, y_max = 0, x_min = width - 1, x_max = 0;
 
@@ -94,14 +94,15 @@ void Pipeline::drawcall(const std::vector<float> &vbo, const Shader &shader, Tex
                     float bc0 = 1.0f - bc1 - bc2;
 
                     float inv_w = bc0 * inv_w0 + bc1 * inv_w1 + bc2 * inv_w2;
-                    vec4 pos = (bc0 * inv_w0 * p0 + bc1 * inv_w1 * p1 + bc2 * inv_w2 * p2) / inv_w;
+                    vec4 ws_pos = (bc0 * inv_w0 * p0 + bc1 * inv_w1 * p1 + bc2 * inv_w2 * p2) / inv_w;
+                    vec4 frag_pos = vec4(x * 1.0f / width, y * 1.0f / height, 0.0f, 0.0f);
                     std::vector<float> varying;
                     for (int j = 0; j < v0.size(); j++)
                     {
                         varying.push_back((bc0 * inv_w0 * v0[j] + bc1 * inv_w1 * v1[j] + bc2 * inv_w2 * v2[j]) / inv_w);
                     }
-                    vec4 color = shader.fragmentShader(pos, varying);
-                    float z = pos[2];
+                    vec4 color = shader.fragmentShader(ws_pos, varying);
+                    float z = ws_pos[2];
 
                     // Depth test
                     if (z < z_buffer.pixel(x, y)[0])
