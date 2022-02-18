@@ -65,7 +65,7 @@ vec4 mat4::operator*(const vec4 &rhs) const
     vec4 ans;
     for (int i = 0; i < 4; i++)
     {
-        ans[i] = lhs.v[i].dot(rhs[i]);
+        ans[i] = lhs.v[i].dot(rhs);
     }
     return ans;
 }
@@ -92,9 +92,9 @@ float mat4::m(int i, int j) const
 mat4 mat4::T() const
 {
     mat4 ans;
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 4; j++)
         {
             ans.m(i, j) = m(j, i);
         }

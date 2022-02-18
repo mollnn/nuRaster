@@ -34,7 +34,7 @@ Widget::Widget(QWidget *parent)
     camera_.aspect = 1.0;
 
     text_edit_scene_.setText("test/test2.obj  0 1000 0  50 \n mitsuba/mitsuba.obj 0 0 0 50");
-    scene_loader_.fromSceneDescription("test/test2.obj  0 1000 0  50 \n mitsuba/mitsuba.obj 0 0 0 50");
+    scene_loader_.fromSceneDescription("test/test2.obj  0 1000 0  50 \n cube/cube.obj 0 0 0 50");
 
     updateVertices();
 
@@ -122,9 +122,10 @@ Widget::Widget(QWidget *parent)
 
     connect(&btn_load_scene_, &QPushButton::clicked, [&]()
             {
-        scene_loader_.fromSceneDescription(text_edit_scene_.toPlainText().toStdString());
-        glwidget_preview_.vertices_.fromStdVector(scene_loader_.getVerticesNormals());
-        renderRT_preview(); });
+                scene_loader_.fromSceneDescription(text_edit_scene_.toPlainText().toStdString());
+                updateVertices();
+                renderRT_preview();
+            });
 
     label_cam_pos_x_.setText(("Cam Pos X"));
     label_cam_pos_y_.setText(("Cam Pos Y"));
@@ -189,7 +190,7 @@ void Widget::renderRT_preview()
 
 void Widget::updateVertices()
 {
-    glwidget_preview_.vertices_ = QVector<float>::fromStdVector(scene_loader_.getVerticesNormals());
+    glwidget_preview_.setVertices(QVector<float>::fromStdVector(scene_loader_.getVerticesNormals()));
 }
 
 void Widget::bindLineEdit(QLineEdit &line_edit, float &var)

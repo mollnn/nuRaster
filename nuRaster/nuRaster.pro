@@ -29,23 +29,32 @@ SOURCES += \
     glwidget.cpp \
     loader.cpp \
     main.cpp \
+    mat4.cpp \
     matblinnphong.cpp \
+    pipeline.cpp \
     renderer.cpp \
+    shadernormal.cpp \
     texture.cpp \
     triangle.cpp \
     vec3.cpp \
+    vec4.cpp \
     widget.cpp
 
 HEADERS += \
     camera.h \
     glwidget.h \
     loader.h \
+    mat4.h \
     matblinnphong.h \
     material.h \
+    pipeline.h \
     renderer.h \
+    shader.h \
+    shadernormal.h \
     texture.h \
     triangle.h \
     vec3.h \
+    vec4.h \
     widget.h
 
 FORMS +=
