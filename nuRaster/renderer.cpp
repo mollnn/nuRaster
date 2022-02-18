@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "shadernormal.h"
 #include "shaderlambert.h"
+#include "matblinnphong.h"
 #include <QMatrix4x4>
 
 void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangles, QImage &img, int SPP, int img_width, int img_height)
@@ -31,31 +32,71 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
                {look_at_center[0], look_at_center[1], look_at_center[2]},
                {camera.up[0], camera.up[1], camera.up[2]});
 
-    ShaderLambert shader;
-    shader.uniforms.mvp = {
-        {mvp(0, 0), mvp(1, 0), mvp(2, 0), mvp(3, 0)},
-        {mvp(0, 1), mvp(1, 1), mvp(2, 1), mvp(3, 1)},
-        {mvp(0, 2), mvp(1, 2), mvp(2, 2), mvp(3, 2)},
-        {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
+    int width = color_buffer.width();
+    int height = color_buffer.height();
 
-    shader.uniforms.kd = 0.7;
-    shader.uniforms.light_pos = vec3(200.0f, 500.0f, -300.0f);
-    shader.uniforms.light_intensity = 1000000.0f;
-
-    std::vector<float> vbo;
-    for (const auto &triangle : triangles)
+    // Clear
+    for (int y = 0; y < height; y++)
     {
-        for (int i = 0; i < 3; i++)
+        for (int x = 0; x < width; x++)
         {
-            for (int j = 0; j < 3; j++)
-                vbo.push_back(triangle.p[i][j]);
-            for (int j = 0; j < 3; j++)
-                vbo.push_back(triangle.n[i][j]);
-            for (int j = 0; j < 3; j++)
-                vbo.push_back(triangle.t[i][j]);
+            color_buffer.pixel(x, y) = vec3(0.1, 0.5, 0.7);
+            z_buffer.pixel(x, y) = 1e18f;
         }
     }
-    pipeline.drawcall(vbo, shader, color_buffer, z_buffer);
+
+    // Classify primitives by material, build shader for each
+    std::map<const Material *, int> material_map;
+    for (const auto &triangle : triangles)
+    {
+        material_map[triangle.mat]++;
+    }
+    int material_count = 0;
+    std::vector<const Material *> material_list;
+    for (auto &[key, value] : material_map)
+    {
+        value = material_count++;
+        material_list.push_back(key);
+    }
+    std::vector<std::vector<const Triangle *>> primitive_partitions(material_count);
+    for (const auto &triangle : triangles)
+    {
+        primitive_partitions[material_map[triangle.mat]].push_back(&triangle);
+    }
+
+    for (int material_id = 0; material_id < material_count; material_id++)
+    {
+        const MatBlinnPhong *material = dynamic_cast<const MatBlinnPhong *>(material_list[material_id]);
+        if (material == nullptr)
+            continue;
+
+        ShaderLambert shader;
+        shader.uniforms.mvp = {
+            {mvp(0, 0), mvp(1, 0), mvp(2, 0), mvp(3, 0)},
+            {mvp(0, 1), mvp(1, 1), mvp(2, 1), mvp(3, 1)},
+            {mvp(0, 2), mvp(1, 2), mvp(2, 2), mvp(3, 2)},
+            {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
+
+        shader.uniforms.kd = material->Kd_;
+        std::cout << shader.uniforms.kd << std::endl;
+        shader.uniforms.light_pos = vec3(200.0f, 500.0f, -300.0f);
+        shader.uniforms.light_intensity = 1000000.0f;
+
+        std::vector<float> vbo;
+        for (const auto &triangle : primitive_partitions[material_id])
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                    vbo.push_back(triangle->p[i][j]);
+                for (int j = 0; j < 3; j++)
+                    vbo.push_back(triangle->n[i][j]);
+                for (int j = 0; j < 3; j++)
+                    vbo.push_back(triangle->t[i][j]);
+            }
+        }
+        pipeline.drawcall(vbo, shader, color_buffer, z_buffer);
+    }
 
     for (int i = 0; i < img_height; i++)
     {

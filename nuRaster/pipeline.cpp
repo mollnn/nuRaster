@@ -10,16 +10,6 @@ void Pipeline::drawcall(const std::vector<float> &vbo, const Shader &shader, Tex
 
     std::vector<std::tuple<vec4, std::vector<float>>> vertex_payload;
 
-    // Clear
-    for (int y = 0; y < height; y++)
-    {
-        for (int x = 0; x < width; x++)
-        {
-            color_buffer.pixel(x, y) = vec3(0.1, 0.5, 0.7);
-            z_buffer.pixel(x, y) = 1e18f;
-        }
-    }
-
     // Vertex Shader Stage
     for (int i = 0; i < vertices_count; i++)
     {
