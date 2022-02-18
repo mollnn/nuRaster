@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "shadernormal.h"
 #include "shaderlambert.h"
+#include "shaderblinnphong.h"
 #include "matblinnphong.h"
 #include <QMatrix4x4>
 
@@ -70,18 +71,27 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
         if (material == nullptr)
             continue;
 
-        ShaderLambert shader;
+        ShaderBlinnPhong shader;
         shader.uniforms.mvp = {
             {mvp(0, 0), mvp(1, 0), mvp(2, 0), mvp(3, 0)},
             {mvp(0, 1), mvp(1, 1), mvp(2, 1), mvp(3, 1)},
             {mvp(0, 2), mvp(1, 2), mvp(2, 2), mvp(3, 2)},
             {mvp(0, 3), mvp(1, 3), mvp(2, 3), mvp(3, 3)}};
 
+        shader.uniforms.ka = material->Ka_;
+        shader.uniforms.use_tex_ka = material->usetex_Ka_;
+        shader.uniforms.tex_ka = &material->map_Ka_;
+
         shader.uniforms.kd = material->Kd_;
         shader.uniforms.use_tex_kd = material->usetex_Kd_;
         shader.uniforms.tex_kd = &material->map_Kd_;
-        
-        shader.uniforms.light_pos = vec3(200.0f, 500.0f, -300.0f);
+
+        shader.uniforms.ks = material->Ks_;
+        shader.uniforms.ns = material->Ns_;
+        shader.uniforms.use_tex_ks = material->usetex_Ks_;
+        shader.uniforms.tex_ks = &material->map_Ks_;
+
+        shader.uniforms.light_pos = vec3(300.0f, 1200.0f, -500.0f);
         shader.uniforms.light_intensity = 1000000.0f;
 
         std::vector<float> vbo;

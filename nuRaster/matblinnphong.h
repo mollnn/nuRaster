@@ -7,6 +7,10 @@
 class MatBlinnPhong : public Material
 {
 public:
+    vec3 Ka_;
+    bool usetex_Ka_;
+    Texture map_Ka_;
+
     vec3 Kd_;
     bool usetex_Kd_;
     Texture map_Kd_;
@@ -16,7 +20,7 @@ public:
     bool usetex_Ks_;
     Texture map_Ks_;
 
-    MatBlinnPhong(const vec3& Kd = 0.0f, const vec3& Ks = 0.0f, float Ns = 10.0f);
+    MatBlinnPhong(const vec3 &Kd = 0.0f, const vec3 &Ks = 0.0f, float Ns = 10.0f, const vec3 &Ka = 0.0f);
 
     virtual vec3 sampleBxdf(const vec3 &wo, const vec3 &normal) const override;
     virtual vec3 bxdf(const vec3 &wo, const vec3 &normal, const vec3 &wi, const vec3 &uv) const override;
@@ -24,7 +28,7 @@ public:
 
     virtual bool isEmission() const override;
     virtual bool requireLightSampling(const vec3 &wo, const vec3 &normal) const override;
-    virtual vec3 emission(const vec3 &wo, const vec3& normal) const override;
+    virtual vec3 emission(const vec3 &wo, const vec3 &normal) const override;
 };
 
 #endif

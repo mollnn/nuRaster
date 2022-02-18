@@ -33,6 +33,7 @@ SOURCES += \
     matblinnphong.cpp \
     pipeline.cpp \
     renderer.cpp \
+    shaderblinnphong.cpp \
     shaderlambert.cpp \
     shadernormal.cpp \
     texture.cpp \
@@ -51,6 +52,7 @@ HEADERS += \
     pipeline.h \
     renderer.h \
     shader.h \
+    shaderblinnphong.h \
     shaderlambert.h \
     shadernormal.h \
     texture.h \

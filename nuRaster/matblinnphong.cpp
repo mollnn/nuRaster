@@ -1,6 +1,6 @@
 #include "MatBlinnPhong.h"
 
-MatBlinnPhong::MatBlinnPhong(const vec3 &Kd, const vec3 &Ks, float Ns) : Kd_(Kd), usetex_Kd_(false), Ks_(Ks), usetex_Ks_(false), Ns_(Ns) {}
+MatBlinnPhong::MatBlinnPhong(const vec3 &Kd, const vec3 &Ks, float Ns, const vec3 &Ka) : Kd_(Kd), usetex_Kd_(false), Ks_(Ks), usetex_Ks_(false), Ns_(Ns), Ka_(Ka), usetex_Ka_(false) {}
 
 vec3 MatBlinnPhong::sampleBxdf(const vec3 &wo, const vec3 &normal) const
 {
@@ -46,7 +46,6 @@ vec3 MatBlinnPhong::bxdf(const vec3 &wo, const vec3 &normal, const vec3 &wi, con
 
 float MatBlinnPhong::pdf(const vec3 &wo, const vec3 &normal, const vec3 &wi) const
 {
-    // Todo: merge
     if (wi.dot(normal) <= 1e-4 || wo.dot(normal) <= 1e-4f)
         return 1e18f;
     float lambda = 0.3f;
