@@ -132,7 +132,7 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
     {
         for (int j = 0; j < img_width; j++)
         {
-            vec3 c = max(0.0f, min(1.0f, color_buffer.pixel(j, i))) * 255.0f;
+            vec3 c = max(0.0f, min(1.0f, color_buffer.pixel(j, i).pow(1.0f / 2.2f))) * 255.0f;
 
             img.setPixelColor(j, i, QColor(c[0], c[1], c[2]));
         }
