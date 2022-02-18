@@ -4,7 +4,7 @@ std::tuple<vec4, ShaderLambertPayloadV> ShaderLambert::_vertexShader(const Shade
 {
     ShaderLambertPayloadV varying;
     vec4 pos = uniforms.mvp * vec4(attributes.pos, 1.0f);
-    varying.normal = (uniforms.mvp * vec4(attributes.normal, 0.0f)).xyz();
+    varying.normal = vec4(attributes.normal, 0.0f).xyz();
     varying.world_space_pos = attributes.pos;
     varying.texcoord = attributes.texcoord;
     return {pos, varying};

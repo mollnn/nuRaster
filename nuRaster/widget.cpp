@@ -74,14 +74,6 @@ Widget::Widget(QWidget *parent)
     grid_layout_.addWidget(&line_edit_preview_level_, 14, 51, 1, 4);
     grid_layout_.addWidget(&label_preview_level_, 14, 50, 1, 1);
 
-    bindLineEdit(line_edit_spp_, spp_);
-    grid_layout_.addWidget(&line_edit_spp_, 15, 51, 1, 4);
-    grid_layout_.addWidget(&label_spp_, 15, 50, 1, 1);
-
-    bindLineEdit(line_edit_spp_preview_, spp_preview_);
-    grid_layout_.addWidget(&line_edit_spp_preview_, 16, 51, 1, 4);
-    grid_layout_.addWidget(&label_spp_preview_, 16, 50, 1, 1);
-
     bindLineEdit(line_edit_cam_pos_x_, camera_.pos[0]);
     grid_layout_.addWidget(&line_edit_cam_pos_x_, 20, 51, 1, 4);
     grid_layout_.addWidget(&label_cam_pos_x_, 20, 50, 1, 1);
@@ -115,6 +107,30 @@ Widget::Widget(QWidget *parent)
     connect(&line_edit_roll_, &QLineEdit::editingFinished, [&]()
             { if(line_edit_roll_.text().toFloat() == camera_.toEuler()[2]) return; camera_.fromEuler(line_edit_yaw_.text().toFloat(), line_edit_pitch_.text().toFloat(), line_edit_roll_.text().toFloat()); renderRT_preview(); });
 
+    bindLineEdit(line_edit_light_pos_x_, light_pos_x_);
+    grid_layout_.addWidget(&line_edit_light_pos_x_, 34, 51, 1, 4);
+    grid_layout_.addWidget(&label_light_pos_x_, 34, 50, 1, 1);
+
+    bindLineEdit(line_edit_light_pos_y_, light_pos_y_);
+    grid_layout_.addWidget(&line_edit_light_pos_y_, 35, 51, 1, 4);
+    grid_layout_.addWidget(&label_light_pos_y_, 35, 50, 1, 1);
+
+    bindLineEdit(line_edit_light_pos_z_, light_pos_z_);
+    grid_layout_.addWidget(&line_edit_light_pos_z_, 36, 51, 1, 4);
+    grid_layout_.addWidget(&label_light_pos_z_, 36, 50, 1, 1);
+
+    bindLineEdit(line_edit_light_int_x_, light_int_x_);
+    grid_layout_.addWidget(&line_edit_light_int_x_, 37, 51, 1, 4);
+    grid_layout_.addWidget(&label_light_int_x_, 37, 50, 1, 1);
+
+    bindLineEdit(line_edit_light_int_y_, light_int_y_);
+    grid_layout_.addWidget(&line_edit_light_int_y_, 38, 51, 1, 4);
+    grid_layout_.addWidget(&label_light_int_y_, 38, 50, 1, 1);
+
+    bindLineEdit(line_edit_light_int_z_, light_int_z_);
+    grid_layout_.addWidget(&line_edit_light_int_z_, 39, 51, 1, 4);
+    grid_layout_.addWidget(&label_light_int_z_, 39, 50, 1, 1);
+
     btn_load_scene_.setText("Load");
     grid_layout_.addWidget(&label_scene_, 40, 50, 1, 1);
     grid_layout_.addWidget(&text_edit_scene_, 41, 50, 8, 5);
@@ -124,14 +140,17 @@ Widget::Widget(QWidget *parent)
             {
                 scene_loader_.fromSceneDescription(text_edit_scene_.toPlainText().toStdString());
                 updateVertices();
-                renderRT_preview();
-            });
+                renderRT_preview(); });
 
     label_cam_pos_x_.setText(("Cam Pos X"));
     label_cam_pos_y_.setText(("Cam Pos Y"));
     label_cam_pos_z_.setText(("Cam Pos Z"));
-    label_spp_.setText(("SPP"));
-    label_spp_preview_.setText(("Preview SPP"));
+    label_light_pos_x_.setText(("Point Light X"));
+    label_light_pos_y_.setText(("Point Light Y"));
+    label_light_pos_z_.setText(("Point Light Z"));
+    label_light_int_x_.setText(("Point Light R"));
+    label_light_int_y_.setText(("Point Light G"));
+    label_light_int_z_.setText(("Point Light B"));
     label_yaw_.setText(("Cam Yaw"));
     label_pitch_.setText(("Cam Pitch"));
     label_roll_.setText(("Cam Roll"));
@@ -166,7 +185,7 @@ void Widget::renderRT()
     int padding_width = label_render_result_.width() - final_width;
     int padding_height = label_render_result_.height() - final_height;
 
-    this->renderer_.render(camera_, triangles, img_render_result_, spp_, img_width_, img_height_);
+    this->renderer_.render(camera_, triangles, img_render_result_, {light_pos_x_, light_pos_y_, light_pos_z_}, {light_int_x_, light_int_y_, light_int_z_}, img_width_, img_height_);
     label_render_result_.setPixmap(QPixmap::fromImage(img_render_result_.scaled(QSize(final_width, final_height)).copy(-padding_width / 2, -padding_height / 2, label_render_result_.width(), label_render_result_.height())));
 }
 
@@ -184,7 +203,7 @@ void Widget::renderRT_preview()
     int padding_width = label_render_result_.width() - final_width;
     int padding_height = label_render_result_.height() - final_height;
 
-    this->renderer_.render(camera_, triangles, img_render_result_, spp_preview_, img_width_ / preview_level_, img_height_ / preview_level_);
+    this->renderer_.render(camera_, triangles, img_render_result_, {light_pos_x_, light_pos_y_, light_pos_z_}, {light_int_x_, light_int_y_, light_int_z_}, img_width_, img_height_);
     label_render_result_.setPixmap(QPixmap::fromImage(img_render_result_.scaled(QSize(final_width, final_height)).copy(-padding_width / 2, -padding_height / 2, label_render_result_.width(), label_render_result_.height())));
 }
 

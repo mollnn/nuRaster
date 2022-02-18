@@ -19,7 +19,6 @@
 #include <QLineEdit>
 #include <QTextEdit>
 
-
 class Widget : public QWidget
 {
     Q_OBJECT
@@ -42,23 +41,22 @@ private:
     GlWidget glwidget_preview_;
     Renderer renderer_;
     QLineEdit line_edit_cam_pos_x_, line_edit_cam_pos_y_, line_edit_cam_pos_z_;
+    QLineEdit line_edit_light_pos_x_, line_edit_light_pos_y_, line_edit_light_pos_z_, line_edit_light_int_x_, line_edit_light_int_y_, line_edit_light_int_z_;
     QLineEdit line_edit_spp_, line_edit_spp_preview_;
     QLineEdit line_edit_yaw_, line_edit_pitch_, line_edit_roll_;
     QLineEdit line_edit_fov_h_, line_edit_aspect_, line_edit_img_w_, line_edit_img_h_, line_edit_preview_level_;
     QLabel label_cam_pos_x_, label_cam_pos_y_, label_cam_pos_z_;
-    QLabel label_spp_, label_spp_preview_;
+    QLabel label_light_pos_x_, label_light_pos_y_, label_light_pos_z_, label_light_int_x_, label_light_int_y_, label_light_int_z_;
     QLabel label_yaw_, label_pitch_, label_roll_;
     QLabel label_fov_h_, label_aspect_, label_img_w_, label_img_h_, label_preview_level_;
     QLabel label_scene_;
-    int spp_ = 32, spp_preview_ = 8;
+    float light_pos_x_=500.0f, light_pos_y_=500.0f, light_pos_z_=500.0f, light_int_x_=100000.0f, light_int_y_=100000.0f, light_int_z_=100000.0f;
     int img_width_ = 256, img_height_ = 256, preview_level_ = 8;
     QTime last_review_render_time_;
     QTextEdit text_edit_scene_;
     QPushButton btn_load_scene_;
-    
 
     void bindLineEdit(QLineEdit &line_edit, float &var);
     void bindLineEdit(QLineEdit &line_edit, int &var);
-
 };
 #endif // WIDGET_H

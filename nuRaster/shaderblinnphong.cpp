@@ -4,7 +4,7 @@ std::tuple<vec4, ShaderBlinnPhongPayloadV> ShaderBlinnPhong::_vertexShader(const
 {
     ShaderBlinnPhongPayloadV varying;
     vec4 pos = uniforms.mvp * vec4(attributes.pos, 1.0f);
-    varying.normal = (uniforms.mvp * vec4(attributes.normal, 0.0f)).xyz();
+    varying.normal = vec4(attributes.normal, 0.0f).xyz();
     varying.world_space_pos = attributes.pos;
     varying.texcoord = attributes.texcoord;
     return {pos, varying};
@@ -22,7 +22,7 @@ vec4 ShaderBlinnPhong::_fragmentShader(const vec4 &pos, const ShaderBlinnPhongPa
 
     vec3 ks = uniforms.use_tex_ks ? uniforms.tex_ks->pixelUV(varying.texcoord[0], varying.texcoord[1]) : uniforms.ks;
     float cs = (2.0f + uniforms.ns) / (4.0f * 3.14159f * (2.0f - pow(2.0f, -0.5f * uniforms.ns)));
-    vec3 specular = ks * uniforms.light_intensity * std::max(0.0f, light_fragpos.normalized().dot(varying.normal.normalized())) / light_fragpos.norm2() * cs;
+    vec3 specular = ks * uniforms.light_intensity * pow(std::max(0.0f, light_fragpos.normalized().dot(varying.normal.normalized())), uniforms.ns) / light_fragpos.norm2() * cs;
 
     return ambient + diffuse + specular;
 }

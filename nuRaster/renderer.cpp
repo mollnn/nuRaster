@@ -10,7 +10,7 @@
 #include "matblinnphong.h"
 #include <QMatrix4x4>
 
-void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangles, QImage &img, int SPP, int img_width, int img_height)
+void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangles, QImage &img, const vec3& light_pos, const vec3& light_int, int img_width, int img_height)
 {
     img = QImage(QSize(img_width, img_height), QImage::Format_RGB888);
     img.fill(Qt::black);
@@ -26,6 +26,7 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
 
     Pipeline pipeline;
 
+    // TODO: Calculate your own MVP matrix
     QMatrix4x4 mvp;
     mvp.perspective(camera.fov_h * std::max(1.0f, camera.aspect), 1, 1, 10000);
     vec3 look_at_center = camera.pos + camera.gaze * 100.0f;
@@ -98,14 +99,14 @@ void Renderer::render(const Camera &camera, const std::vector<Triangle> &triangl
 
             shader.uniforms.kd = 0.7f;
             shader.uniforms.use_tex_kd = false;
-            
+
             shader.uniforms.ks = 0.0f;
             shader.uniforms.ns = 1.0f;
             shader.uniforms.use_tex_ks = false;
         }
 
-        shader.uniforms.light_pos = vec3(300.0f, 1200.0f, -500.0f);
-        shader.uniforms.light_intensity = 1000000.0f;
+        shader.uniforms.light_pos = light_pos;
+        shader.uniforms.light_intensity = light_int;
 
         std::vector<float> vbo;
         for (const auto &triangle : primitive_partitions[material_id])
